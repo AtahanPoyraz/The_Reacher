@@ -14,15 +14,14 @@ import (
 var (
 	platform = strings.ToLower(runtime.GOOS)
 )
-
 var (
 	ans	 	 string
 	url 	 string
 	IP   	 string
 	path 	 string
-	protocol string
 	sport 	 int
 	eport  	 int
+	tout	 int
 )
 
 func main() {
@@ -35,12 +34,12 @@ func main() {
     ▀▀ █▪ ▀▀▀ ·▀▀▀ .▀  ▀ ▀█▄▀▪     ▀▀▀▀  ▀▀▀▀ ▀▪ ▀█▄▀▪.▀  ▀▀▀▀▀▀•
     _______________________________________________________________
                                                    by Atahan Poyraz
-    [01] IP TRACKER
-    [02] WEBSITE INFORMATION                   
-    [03] PORT SCAN     
-    [04] URL EXPLORATION                  
+    [%s01%s] IP TRACKER
+    [%s02%s] WEBSITE INFORMATION                   
+    [%s03%s] PORT SCAN     
+    [%s04%s] URL EXPLORATION                  
 
-> %s`, "\x1b[1;31m", "\x1b[1;0m")
+> %s`, "\x1b[1;31m","\x1b[1;32m","\x1b[1;31m","\x1b[1;32m","\x1b[1;31m","\x1b[1;32m","\x1b[1;31m","\x1b[1;32m","\x1b[1;31m","\x1b[1;0m")
 	fmt.Scan(&ans)
 
 	if ans == "1" || ans == "01" {
@@ -66,7 +65,7 @@ func main() {
 		fmt.Printf("%s[11]%s Org: %s\n", "\x1b[1;93m", "\x1b[1;0m", data.Org)
 		fmt.Printf("%s[12]%s AS: %s\n", "\x1b[1;93m", "\x1b[1;0m", data.AS)
 		fmt.Printf("%s[13]%s Query: %s\n", "\x1b[1;93m", "\x1b[1;0m", data.Query)
-
+		
 	} else if ans == "2" || ans == "02" {
 		fmt.Printf("%s[+]%s Target URL: ", "\x1b[1;32m", "\x1b[1;0m")
 		fmt.Scan(&url)
@@ -80,20 +79,22 @@ func main() {
     	getInfo.Control()
 
 	} else if ans == "3" || ans == "03" {
-		fmt.Printf("%s[+]%s Protocol   : ", "\x1b[1;32m", "\x1b[1;0m")
-		fmt.Scan(&protocol)
 		fmt.Printf("%s[+]%s Target IP  : ", "\x1b[1;32m", "\x1b[1;0m")
 		fmt.Scan(&IP)
 		fmt.Printf("%s[+]%s Start Port : ", "\x1b[1;32m", "\x1b[1;0m")
 		fmt.Scan(&sport)
 		fmt.Printf("%s[+]%s End Port   : ", "\x1b[1;32m", "\x1b[1;0m")
 		fmt.Scan(&eport)
+		fmt.Printf("%s[+]%s Time Out   : ", "\x1b[1;32m", "\x1b[1;0m")
+		fmt.Scan(&tout)
 		fmt.Printf("%s--------------------------------%s\n", "\x1b[1;37m", "\x1b[1;0m")
 
-		results := Scripts.ScanPorts(protocol, IP, sport, eport)
-		for _, result := range results {
-			fmt.Printf("%s[+]%s Port %d : %s\n", "\x1b[1;32m", "\x1b[1;0m", result.Port, result.State)
+		Domain := Scripts.WebInfo{
+			TargetIP: IP,
+			PortsList: Scripts.PORTS("%d-%d", sport, eport),
+			Timeout: time.Duration(tout) * time.Second,
 		}
+		Scripts.StartScanning(Domain)
 
 	} else if ans == "4" || ans == "04" {
 		fmt.Printf("%s[+]%s Target URL   : ", "\x1b[1;32m", "\x1b[1;0m")
