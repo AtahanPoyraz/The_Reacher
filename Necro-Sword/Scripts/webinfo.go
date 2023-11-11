@@ -6,9 +6,53 @@ import (
     "net/url"
     "net/http"
     "crypto/tls"
+    "encoding/json"
     "strings"
     "io/ioutil"
 )
+
+type WhoisResponse struct {
+	Server         string   `json:"server"`
+	Name           string   `json:"name"`
+	IDNName        string   `json:"idnName"`
+	Status         string   `json:"status"`
+	Nameserver     []string `json:"nameserver"`
+	IPS            string   `json:"ips"`
+	Created        string   `json:"created"`
+	Changed        string   `json:"changed"`
+	Expires        string   `json:"expires"`
+	Registered     bool     `json:"registered"`
+	DNSSEC         string   `json:"dnssec"`
+	WhoisServer    string   `json:"whoisserver"`
+	Contacts       Contacts `json:"contacts"`
+	Registrar      string   `json:"registrar"`
+	RawData        []string `json:"rawdata"`
+	Network        string   `json:"network"`
+	Exception      string   `json:"exception"`
+	ParsedContacts bool     `json:"parsedContacts"`
+	Template       struct {
+		WhoisNIC string `json:"whois.nic.tr"`
+	} `json:"template"`
+}
+
+type Contacts struct {
+	Owner []struct {
+		Handle       interface{} `json:"handle"`
+		Type         interface{} `json:"type"`
+		Name         interface{} `json:"name"`
+		Organization string      `json:"organization"`
+		Email        interface{} `json:"email"`
+		Address      string      `json:"address"`
+		Zipcode      interface{} `json:"zipcode"`
+		City         string      `json:"city"`
+		State        interface{} `json:"state"`
+		Country      interface{} `json:"country"`
+		Phone        interface{} `json:"phone"`
+		Fax          interface{} `json:"fax"`
+		Created      interface{} `json:"created"`
+		Changed      interface{} `json:"changed"`
+	} `json:"owner"`
+}
 
 type INFO struct {
     URL         string
@@ -39,6 +83,7 @@ func (i *INFO) Control() {
     i.GetHTTPInfo()
     i.GetRobotsTxt()
     i.GetSSLInfo()
+    i.GetWhoIsInfo()
 }
 
 func (i *INFO) GetServerInfo() {
@@ -121,6 +166,78 @@ func (i *INFO) GetRobotsTxt() {
 
     fmt.Println("Robots.txt Content:")
     fmt.Println(string(robotsContent))
+}
+
+func (i *INFO) GetWhoIsInfo() {
+    fmt.Printf("%s[+]%s Getting Whois Info..\n", "\x1b[1;32m", "\x1b[1;0m")
+
+    whoisURL := "https://whoisjson.com/api/v1/whois"
+    queryParams := url.Values{"domain": {i.Host}}
+    fullURL := whoisURL + "?" + queryParams.Encode()
+
+    // Kullanıcı https:// ile başladıysa bunu kaldır
+    if strings.HasPrefix(i.Host, "https://") {
+        i.Host = strings.TrimPrefix(i.Host, "https://")
+    }
+
+    req, err := http.NewRequest("GET", fullURL, nil)
+    if err != nil {
+        fmt.Println("Error creating request:", err)
+        return
+    }
+
+    req.Header.Set("Authorization", "Token=48ba9979767cc7d0e8a6467c2b1709a2363c677b8c1eb0953e4f81c64116a0a6")
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        fmt.Println("Error making request:", err)
+        return
+    }
+    defer resp.Body.Close()
+
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        fmt.Println("Error reading response body:", err)
+        return
+   }
+
+    var whoisResponse WhoisResponse
+    err = json.Unmarshal(body, &whoisResponse)
+    if err != nil {
+        fmt.Println("Error decoding JSON:", err)
+        return
+    }
+
+    // Print each field of the struct
+    fmt.Println("Server:", whoisResponse.Server)
+    fmt.Println("Name:", whoisResponse.Name)
+    fmt.Println("IDN Name:", whoisResponse.IDNName)
+    fmt.Println("Status:", whoisResponse.Status)
+    fmt.Println("Nameserver:", whoisResponse.Nameserver)
+    fmt.Println("IPS:", whoisResponse.IPS)
+    fmt.Println("Created:", whoisResponse.Created)
+    fmt.Println("Changed:", whoisResponse.Changed)
+    fmt.Println("Expires:", whoisResponse.Expires)
+    fmt.Println("Registered:", whoisResponse.Registered)
+    fmt.Println("DNSSEC:", whoisResponse.DNSSEC)
+    fmt.Println("Whois Server:", whoisResponse.WhoisServer)
+
+    // Print contacts information
+    fmt.Println("Contacts:")
+    for _, owner := range whoisResponse.Contacts.Owner {
+        fmt.Println("  Organization:", owner.Organization)
+        fmt.Println("  Address:", owner.Address)
+        fmt.Println("  City:", owner.City)
+        fmt.Println("  Country:", owner.Country)
+    }
+
+    fmt.Println("Registrar:", whoisResponse.Registrar)
+    fmt.Println("Raw Data:", whoisResponse.RawData)
+    fmt.Println("Network:", whoisResponse.Network)
+    fmt.Println("Exception:", whoisResponse.Exception)
+    fmt.Println("Parsed Contacts:", whoisResponse.ParsedContacts)
+    fmt.Println("Template - Whois NIC:", whoisResponse.Template.WhoisNIC)
 }
 
 func (i *INFO) GetSSLInfo() {
