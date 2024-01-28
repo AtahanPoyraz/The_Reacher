@@ -8,38 +8,39 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AtahanPoyraz/Necro-Sword/Scripts"
+	"github.com/AtahanPoyraz/The_Reacher/Scripts"
 )
 
 var (
 	platform = strings.ToLower(runtime.GOOS)
 )
 var (
-	ans	 	 string
-	url 	 string
-	IP   	 string
-	path 	 string
-	sport 	 int
-	eport  	 int
-	tout	 int
+	ans   string
+	url   string
+	IP    string
+	path  string
+	sport int
+	eport int
+	tout  int
 )
 
 func main() {
 	Clear()
 	fmt.Printf(`%s
-     ▐ ▄ ▄▄▄ . ▄▄· ▄▄▄            .▄▄ · ▄▄▌ ▐ ▄▌      ▄▄▄  ·▄▄▄▄  
-    •█▌▐█▀▄.▀·▐█ ▌▪▀▄ █·▪         ▐█ ▀. ██· █▌▐█▪     ▀▄ █·██▪ ██ 
-    ▐█▐▐▌▐▀▀▪▄██ ▄▄▐▀▀▄  ▄█▀▄     ▄▀▀▀█▄██▪▐█▐▐▌ ▄█▀▄ ▐▀▀▄ ▐█· ▐█▌
-    ██▐█▌▐█▄▄▌▐███▌▐█•█▌▐█▌.▐▌    ▐█▄▪▐█▐█▌██▐█▌▐█▌.▐▌▐█•█▌██. ██ 
-    ▀▀ █▪ ▀▀▀ ·▀▀▀ .▀  ▀ ▀█▄▀▪     ▀▀▀▀  ▀▀▀▀ ▀▪ ▀█▄▀▪.▀  ▀▀▀▀▀▀•
-    _______________________________________________________________
-                                                   by Atahan Poyraz
+	████████╗██╗  ██╗███████╗    ██████╗ ███████╗ █████╗  ██████╗██╗  ██╗███████╗██████╗ 
+	╚══██╔══╝██║  ██║██╔════╝    ██╔══██╗██╔════╝██╔══██╗██╔════╝██║  ██║██╔════╝██╔══██╗
+	   ██║   ███████║█████╗      ██████╔╝█████╗  ███████║██║     ███████║█████╗  ██████╔╝
+	   ██║   ██╔══██║██╔══╝      ██╔══██╗██╔══╝  ██╔══██║██║     ██╔══██║██╔══╝  ██╔══██╗
+	   ██║   ██║  ██║███████╗    ██║  ██║███████╗██║  ██║╚██████╗██║  ██║███████╗██║  ██║
+	   ╚═╝   ╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+    _____________________________________________________________________________________
+                                                   						 by Atahan Poyraz
     [%s01%s] IP TRACKER
     [%s02%s] WEBSITE INFORMATION                   
     [%s03%s] PORT SCAN     
     [%s04%s] URL EXPLORATION                  
 
-> %s`, "\x1b[1;31m","\x1b[1;32m","\x1b[1;31m","\x1b[1;32m","\x1b[1;31m","\x1b[1;32m","\x1b[1;31m","\x1b[1;32m","\x1b[1;31m","\x1b[1;0m")
+> %s`, "\x1b[1;31m", "\x1b[1;32m", "\x1b[1;31m", "\x1b[1;32m", "\x1b[1;31m", "\x1b[1;32m", "\x1b[1;31m", "\x1b[1;32m", "\x1b[1;31m", "\x1b[1;0m")
 	fmt.Scan(&ans)
 
 	if ans == "1" || ans == "01" {
@@ -65,7 +66,7 @@ func main() {
 		fmt.Printf("%s[11]%s Org: %s\n", "\x1b[1;93m", "\x1b[1;0m", data.Org)
 		fmt.Printf("%s[12]%s AS: %s\n", "\x1b[1;93m", "\x1b[1;0m", data.AS)
 		fmt.Printf("%s[13]%s Query: %s\n", "\x1b[1;93m", "\x1b[1;0m", data.Query)
-		
+
 	} else if ans == "2" || ans == "02" {
 		fmt.Printf("%s[+]%s Target URL: ", "\x1b[1;32m", "\x1b[1;0m")
 		fmt.Scan(&url)
@@ -76,7 +77,7 @@ func main() {
 			fmt.Printf("%s[!]%s Error: %e", "\x1b[1;93m", "\x1b[1;0m", err)
 			return
 		}
-    	getInfo.Control()
+		getInfo.Control()
 
 	} else if ans == "3" || ans == "03" {
 		fmt.Printf("%s[+]%s Target IP  : ", "\x1b[1;32m", "\x1b[1;0m")
@@ -90,9 +91,9 @@ func main() {
 		fmt.Printf("%s--------------------------------%s\n", "\x1b[1;37m", "\x1b[1;0m")
 
 		Domain := Scripts.WebInfo{
-			TargetIP: IP,
+			TargetIP:  IP,
 			PortsList: Scripts.PORTS("%d-%d", sport, eport),
-			Timeout: time.Duration(tout) * time.Second,
+			Timeout:   time.Duration(tout) * time.Second,
 		}
 		Scripts.StartScanning(Domain)
 
